@@ -27,6 +27,10 @@ fields. -->
 <!-- Include paragraphs describing article scope, why it's helpful, who should
 read it, and what the reader will learn. -->
 
+Compiling software is not a glamourous job, but it is a critical part of every developers workflow. The process of compiling software has evolved over the decades moving from developers compiling artifacts locally, to centralized build servers, to multistage Docker images, and now to a relatively new process called buildpacks.
+
+In this post we'll look at the history of compiling software and see how buildpacks have evolved to provide developers with an opinionated and convenient process for building their source code.
+
 ## What is ________?
 
 <!-- OPTIONAL! -->
