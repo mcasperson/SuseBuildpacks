@@ -136,6 +136,8 @@ Buildpacks have been used by these platforms to take application source code wri
 
 Our sample buildpack will be quite simple and use only a subset of the functionality available to us. But even with this simple example, we can demonstrate many of the benefits that buildpacks bring to a build pipeline.
 
+We start with the `buildpack.toml` file:
+
 ```toml
 # Buildpack API version
 api = "0.5"
@@ -151,6 +153,76 @@ name = "Java Buildpack"
 id = "heroku-20"
 ```
 
+The schema for the `buildpack.toml` file is documented [here](https://buildpacks.io/docs/reference/spec/buildpack-api/#schema), but we'll break down the example file here.
+
+The `api` property defines the buildpack API version the buildpack adheres to:
+
+```
+api = "0.5"
+```
+
+The `buildpack` section defines the details of our buildpack. The `id` property is a globally unique identifier, the `version` property defines the buildpack version, and the `name` defines a human readable name.
+
+```
+[buildpack]
+id = "mcasperson/java"
+version = "0.0.1"
+name = "Java Buildpack"
+```
+
+The `stacks` array (the double brackets defines an array item in TOML) defines a stack that this buildpack is compatible with.
+
+A *stack* is a pair of Docker images: one image that is used to build the software, and a second image used to host the application. It is possible to create these images yourself, but we'll reuse an existing stack. We can find a list of stacks with the command `pack stack suggest`, which returns the following list:
+
+```
+Stacks maintained by the community:
+
+    Stack ID: heroku-18
+    Description: The official Heroku stack based on Ubuntu 18.04
+    Maintainer: Heroku
+    Build Image: heroku/pack:18-build
+    Run Image: heroku/pack:18
+
+    Stack ID: heroku-20
+    Description: The official Heroku stack based on Ubuntu 20.04
+    Maintainer: Heroku
+    Build Image: heroku/pack:20-build
+    Run Image: heroku/pack:20
+
+    Stack ID: io.buildpacks.stacks.bionic
+    Description: A minimal Paketo stack based on Ubuntu 18.04
+    Maintainer: Paketo Project
+    Build Image: paketobuildpacks/build:base-cnb
+    Run Image: paketobuildpacks/run:base-cnb
+
+    Stack ID: io.buildpacks.stacks.bionic
+    Description: A large Paketo stack based on Ubuntu 18.04
+    Maintainer: Paketo Project
+    Build Image: paketobuildpacks/build:full-cnb
+    Run Image: paketobuildpacks/run:full-cnb
+
+    Stack ID: io.paketo.stacks.tiny
+    Description: A tiny Paketo stack based on Ubuntu 18.04, similar to distroless
+    Maintainer: Paketo Project
+    Build Image: paketobuildpacks/build:tiny-cnb
+    Run Image: paketobuildpacks/run:tiny-cnb
+```
+
+Our buildpack will be compatible with the `heroku-20` stack:
+
+```
+[[stacks]]
+id = "heroku-20"
+```
+
+The next file is a bash script called `detect`. These executables are called as part of the buildpack lifecycle. The `detect` executable determines if the source code the buildpack has been run against is a Java Maven application.
+
+Note buildpacks do not mandate what kind of executable can be used here. We have used a Bash script for convenience, but these executables could just as easily be written in Go, Python, Java, or any other language.
+
+One or more buildpacks can be combined into a builder. Each buildpack is responsible for determining if it is compatible with the supplied source code, and the first compatible buildpack will be used to compile the code. This is how we can run a command like `pack build` against our code without having to define what language our code is written in; builders like the ones supplied by Heroku come with many buildpacks that detect many different languages.
+
+Our detection script is simple: if a `pom.xml` file does not exist, we return a non-zero return code to indicate that our buildpack is not compatible. Otherwise the script has a zero return code to indicate that it is compatible:
+
 ```bash
 #!/usr/bin/env bash
 
@@ -164,6 +236,8 @@ if [[ ! -f pom.xml ]]; then
 	exit 100
 fi
 ```
+
+The work of building the source code is done in the `build` executable:
 
 ```bash
 #!/usr/bin/env bash
@@ -234,6 +308,22 @@ EOF
 	break;
 done
 ```
+
+The `build` script is doing a lot of heavy lifting, so let's break down the code.
+
+We configure Bash to fail if any command in the script fails. This means we don't mask errors returned by any commands called in this script:
+
+```bash
+set -eo pipefail
+```
+
+The first argument passed to the `build` script is the directory holding our layers:
+
+```bash
+layersdir=$1
+```
+
+Buildpacks use layers to hold files that are of importance when building the code and running the compiled application. Layers can optionally be cached to ensure that any files saved by a previous build are reused.
 
 ## What is ________?
 
