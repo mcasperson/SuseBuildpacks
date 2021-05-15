@@ -104,10 +104,10 @@ pack build myimage
 
 It is important to note that we do not need to have the Java Development Kit (JDK) or Maven installed for `pack` to build our source code. We also don't need to tell `pack` that we are trying to build Java code. The Heroku builder (or any other builder you may be using) conveniently takes care of all of this for us.
 
-The first time you run a build, all of the application dependencies are downloaded. And there are a lot! On my home internet connection, it took around 15 minutes to complete the downloads. Once these downloads complete, the application is compiled, and a Docker image called `myimage` is created. We can verify this by running the command:
+The first time you run a build, all of the application dependencies are downloaded. And there are a lot! On my home internet connection, it took around 30 minutes to complete the downloads. Once these downloads complete, the application is compiled, and a Docker image called `myimage` is created. We can verify this by running the command:
 
 ```
-docker image ls myimage
+docker image ls --filter reference=myimage
 ```
 
 To run the Docker image, run the command:
