@@ -53,9 +53,64 @@ Buildpacks are:
 * Repeatable, requiring only one application to be installed alongside Docker to build any number of languages.
 * Flexible, with an open specification allowing anyone to define their own build process.
 
+For all these benefits though, buildpacks are not a complete replacement for your CI system. For a start, buildpacks only generate Docker images. If you deploy applications to a web or application server, buildpacks won't generate the kind of traditional artifacts you need. It is also quite likely that you will execute buildpacks on a CI server to retain the benefits of a centralized source of truth.
+
 To demonstrate just how powerful buildpacks are, let's take a typical Java application that has no Docker build configurations and create an executable Docker image with a buidlpack.
 
+## Building an example application
 
+[Petclinic](https://github.com/spring-projects/spring-petclinic) is a sample Java Spring web application that has been lovingly maintained over the years as a demonstration of the Spring platform. It represents the kind of code base you would find in many engineering departments. Although the git repository contains a `docker-compose.yml` file, this is only to run a MySQL database instance - the application source code has no facility to build Docker images.
+
+Clone the git repository with the command:
+
+```
+git clone https://github.com/spring-projects/spring-petclinic.git
+```
+
+In order to use buildpacks, ensure you have [Docker](https://www.docker.com/) installed.
+
+To build the sample application with a buildpack, we'll need to install what is known as a *platform*, which in our case is a CLI tool called `pack`. Instructions for installing `pack` can be found [here](https://buildpacks.io/docs/tools/pack/), with packages available for most major operating systems.
+
+When you first run `pack` you will be prompted to configure a default builder. We'll cover terminology like *builder* in more detail later in the post, but for now all we need to understand is that a builder contains the buildpacks that compile our code, and that companies like Heroku and Google, and groups like Paketo, provide a number of builders we can use. Here is the output of `pack` asking us to define a default builder:
+
+```
+Please select a default builder with:
+
+        pack config default-builder <builder-image>
+
+Suggested builders:
+        Google:                gcr.io/buildpacks/builder:v1      Ubuntu 18 base image with buildpacks for .NET, Go, Java, Node.js, and Python
+        Heroku:                heroku/buildpacks:18              Base builder for Heroku-18 stack, based on ubuntu:18.04 base image
+        Heroku:                heroku/buildpacks:20              Base builder for Heroku-20 stack, based on ubuntu:20.04 base image
+        Paketo Buildpacks:     paketobuildpacks/builder:base     Ubuntu bionic base image with buildpacks for Java, .NET Core, NodeJS, Go, Ruby, NGINX and Procfile
+        Paketo Buildpacks:     paketobuildpacks/builder:full     Ubuntu bionic base image with buildpacks for Java, .NET Core, NodeJS, Go, PHP, Ruby, Apache HTTPD, NGINX and Procfile
+        Paketo Buildpacks:     paketobuildpacks/builder:tiny     Tiny base image (bionic build image, distroless-like run image) with buildpacks for Java Native Image and Go
+
+Tip: Learn more about a specific builder with:
+        pack builder inspect <builder-image>
+```
+
+We'll make use of the Heroku Ubuntu 20.04 builder, which we configure with the command:
+
+```
+pack config default-builder heroku/buildpacks:20
+```
+
+Then, in the directory containing the petclinic source code, run the command:
+
+```
+pack build myimage
+```
+
+It is important to note that we do not need to have the Java Development Kit (JDK) or Maven installed for `pack` to build our source code. We also don't need to tell `pack` that we are trying to build Java code. The Heroku builder takes care of all of this for us.
+
+## A sample buildpack
+
+The buildpack specification has been in development for at least a decade. Buildpacks were first conceived by Heroku in 2011, and since then Heroku and Pivotal have worked to formalize the specification as part of the Cloud Native Buildpacks project. 
+
+Buildpacks have been used by these platforms to take application source code written in a huge variety of languages, compile it into a Docker image, and then host that image on a variety of Platform as a Service (PaaS) offerings. To accommodate the variety of code that developers host on these platforms, the [buildpack interface specification](https://github.com/buildpacks/spec/blob/main/buildpack.md) is quite detailed and flexible.
+
+However, our sample buildpack will be quite simple and use only a subset of the functionality available to us. But even with this simple example, we can demonstrate many of the benefits that buildpacks bring to a build pipeline.
 
 ## What is ________?
 
