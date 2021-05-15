@@ -48,8 +48,8 @@ Still, Docker's ability to precisely define the environment in which an applicat
 This is where buildpacks come in. A buildpack implements an opinionated build process within a Docker container that takes care of all the fiddly aspects of managing SDKs, caching dependencies, and reducing build times to create an executable Docker image from the supplied source code. This means developers can write their code as they always have, with no Docker build scripts, compile that code with a buildpack, and have their compiled application embedded into an executable Docker image.
 
 Buildpacks are:
-* Efficient, as they are specially designed to leverage Docker's functionality to ensure builds are as fast as possible.
 * Convenient, as their opinionated workflows require no special knowledge to use, and are trivial to execute.
+* Efficient, as they are specially designed to leverage Docker's functionality to ensure builds are as fast as possible.
 * Repeatable, requiring only one application to be installed alongside Docker to build any number of languages.
 * Flexible, with an open specification allowing anyone to define their own build process.
 
@@ -59,7 +59,7 @@ To demonstrate just how powerful buildpacks are, let's take a typical Java appli
 
 ## Building an example application
 
-[Petclinic](https://github.com/spring-projects/spring-petclinic) is a sample Java Spring web application that has been lovingly maintained over the years as a demonstration of the Spring platform. It represents the kind of code base you would find in many engineering departments. Although the git repository contains a `docker-compose.yml` file, this is only to run a MySQL database instance - the application source code has no facility to build Docker images.
+[Petclinic](https://github.com/spring-projects/spring-petclinic) is a sample Java Spring web application that has been lovingly maintained over the years as a demonstration of the Spring platform. It represents the kind of code base you would find in many engineering departments. Although the git repository contains a `docker-compose.yml` file, this is only to run a MySQL database instance - neither the application source code nor the build scripts provide any facility to build Docker images.
 
 Clone the git repository with the command:
 
@@ -102,7 +102,25 @@ Then, in the directory containing the petclinic source code, run the command:
 pack build myimage
 ```
 
-It is important to note that we do not need to have the Java Development Kit (JDK) or Maven installed for `pack` to build our source code. We also don't need to tell `pack` that we are trying to build Java code. The Heroku builder takes care of all of this for us.
+It is important to note that we do not need to have the Java Development Kit (JDK) or Maven installed for `pack` to build our source code. We also don't need to tell `pack` that we are trying to build Java code. The Heroku builder (or any other builder you may be using) conveniently takes care of all of this for us.
+
+The first time you run a build, all of the application dependencies are downloaded. And there are a lot! On my home internet connection, it took around 15 minutes to complete the downloads. Once these downloads complete, the application is compiled, and a Docker image called `myimage` is created. We can verify this by running the command:
+
+```
+docker image ls myimage
+```
+
+To run the Docker image, run the command:
+
+```
+docker run -p 8080:8080 myimage
+```
+
+The resulting web application has been exposed on port 8080, so we can access it via the URL http://localhost:8080. You will see a page like this:
+
+![](petclinic.png)
+
+
 
 ## A sample buildpack
 
