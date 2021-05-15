@@ -217,7 +217,7 @@ Our buildpack will be compatible with the `heroku-20` stack:
 id = "heroku-20"
 ```
 
-The next file is a bash script called `detect`. These executables are called as part of the buildpack lifecycle. The `detect` executable determines if the source code the buildpack has been run against is a Java Maven application.
+The next file is a bash script called `detect`, in the `bin` subdirectory. These executables are called as part of the buildpack lifecycle. The `detect` executable determines if the source code the buildpack has been run against is a Java Maven application.
 
 Note buildpacks do not mandate what kind of executable can be used here. We have created a Bash script for convenience, but these executables could just as easily be written in Go, Python, Java, or any other language.
 
@@ -239,7 +239,7 @@ if [[ ! -f pom.xml ]]; then
 fi
 ```
 
-The work of building the source code is performed in the `build` executable:
+The work of building the source code is performed in the `build` executable, also in the `bin` subdirectory:
 
 ```bash
 #!/usr/bin/env bash
