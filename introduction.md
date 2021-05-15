@@ -420,7 +420,7 @@ JAVA_HOME=$jdkLayer $mavenLayer/bin/mvn -Dmaven.repo.local=$dependencieslayer/.m
 
 Once the build completes, we'll have a `jar` file in the `target` directory. We don't know the exact name of this file, but we know there will be one `jar` file, so we use the `find` command to return the matching file.
 
-The `jar` file needs to be configured to be executed in the executable image. This is done via the `launch.toml` file.
+The `jar` file needs to be configured to be executed in the executable image. This is done in the `launch.toml` file.
 
 The `type` is set to `web`. If the `type` was set to any other value, we'd have to define the `PACK_PROCESS_TYPE` to the same value when running the executable image. But the `type` of `web` means we can run the executable image with no special configuration.
 
@@ -437,43 +437,28 @@ EOF
 done
 ```
 
-## What is ________?
+With the `buildpack.toml`, `bin/detect`, and `bin/build` files written, we now have a buildpack we can use to build our application. Assuming the petclinic code is in the `spring-petclinic` directory, and the buildpack files are in the `JavaBuildPack` directory, we build our Docker image with the command:
 
-<!-- OPTIONAL! -->
+```
+pack build petclinic --path ./spring-petclinic --buildpack ./JavaBuildPack
+```
 
-<!-- You can optionally include a what is section to introduce and broadly
-define the theme of the article. -->
+As before, our code is compiled into an executable image, but this time called `petclinic`. Our custom build pack will:
 
-## Terminology
+1. Detect the presence of a `pom.xml` file, and indicate that this buildpack is compatible with the supplied source code.
+1. Create four layers to hold the Maven dependencies, the Maven distribution, the JDK, and the JRE.
+2. If the layers have not yet been populated, Maven, a JDK, and a JRE are downloaded and extracted into their associated layer.
+3. A Maven build is performed, placing any downloaded dependencies into the associated layer.
+4. The executable image is created containing the generated `jar` file and the JRE layer, and configured to execute the `jar` file.
+5. All layers are cached, so subsequent builds can skip most, of not all, of the file downloads performed during the first build.
 
-<!-- OPTIONAL! -->
-
-<!-- Often, it is useful to include a section defining any specialized
-terminology that will be used in the article or that the reader might come
-across while doing independent research. -->
-
-
-
-
-<!-- After the introductory sections, include sections that introduce and
-explain the concepts, processes, and systems related to the topic.  The section
-names and organization will vary widely from article to article.
-
-## (Section)
-
-### sub-section
-### sub-section
-
-## (Section)
-
-### sub-section
-### sub-section
-
-## (Section)
-
--->
+And with that we have created our very own buildpack to compile Java Maven applications.
 
 ## Conclusion
+
+There are many high quality and battle tested buildpacks created by PaaS platforms who are heavily invested in building and deploying whatever code their customers throw at them. Anyone getting started with buildpacks would be well served by these freely available options.
+
+For those looking to provide a customized build experience for their team though, a custom buildpack may be the answer. In this post we built a simple buildpack to compile a Java Maven application, and with three relatively simple files we were able to construct and run a custom build pack against our sample application.
 
 <!--
 
