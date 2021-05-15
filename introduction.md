@@ -221,9 +221,9 @@ The next file is a bash script called `detect`. These executables are called as 
 
 Note buildpacks do not mandate what kind of executable can be used here. We have created a Bash script for convenience, but these executables could just as easily be written in Go, Python, Java, or any other language.
 
-One or more buildpacks can be combined into a builder. Each buildpack is responsible for determining if it is compatible with the supplied source code, and the first compatible buildpack will be used to compile the code. This is how we can run a command like `pack build` against an arbitrary code base without having to define what language our code is written in; builders like the ones supplied by Heroku come with many buildpacks that detect many different languages.
+One or more buildpacks can be combined into a builder. Each buildpack is responsible for determining if it is compatible with the supplied source code, and the first compatible buildpack will be used to compile the code. This is how we can run a command like `pack build` against an arbitrary code base without having to define what language our code is written in, as builders like the ones supplied by Heroku come with many buildpacks that detect many different languages.
 
-Our detection script is simple: if a `pom.xml` file does not exist, we return a non-zero return code to indicate that our buildpack is not compatible. Otherwise the script has a zero return code to indicate that it is compatible:
+Our detection script is simple: if a `pom.xml` file does not exist, we return a non-zero exit code to indicate that our buildpack is not compatible. Otherwise the script returns an exit code of zero to indicate that it is compatible:
 
 ```bash
 #!/usr/bin/env bash
