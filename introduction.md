@@ -138,7 +138,7 @@ Buildpacks have been used by these platforms to consume application source code 
 
 Our sample buildpack will be quite simple and use only a subset of the functionality available to us. But even with this simple example, we can demonstrate many of the benefits that buildpacks bring to a build pipeline.
 
-We start with the `buildpack.toml` file:
+Our custom buildpack starts with the `buildpack.toml` file:
 
 ```toml
 # Buildpack API version
@@ -155,7 +155,7 @@ name = "Java Buildpack"
 id = "heroku-20"
 ```
 
-The schema for the `buildpack.toml` file is documented [here](https://buildpacks.io/docs/reference/spec/buildpack-api/#schema), but we'll break down the example file here.
+The schema for the `buildpack.toml` file is documented [here](https://buildpacks.io/docs/reference/spec/buildpack-api/#schema), but we'll break down the example file below.
 
 The `api` property defines the buildpack API version the buildpack adheres to:
 
@@ -172,7 +172,7 @@ version = "0.0.1"
 name = "Java Buildpack"
 ```
 
-The `stacks` array (the double brackets defines an array item in TOML) defines a stack that this buildpack is compatible with.
+The `stacks` array (double brackets defines an array item in TOML) defines a stack that this buildpack is compatible with.
 
 A *stack* is a pair of Docker images: one image that is used to build the software, and a second image used to host the application. It is possible to create these images yourself, but we'll reuse an existing stack. We can find a list of stacks with the command `pack stack suggest`, which returns the following list:
 
@@ -219,9 +219,9 @@ id = "heroku-20"
 
 The next file is a bash script called `detect`. These executables are called as part of the buildpack lifecycle. The `detect` executable determines if the source code the buildpack has been run against is a Java Maven application.
 
-Note buildpacks do not mandate what kind of executable can be used here. We have used a Bash script for convenience, but these executables could just as easily be written in Go, Python, Java, or any other language.
+Note buildpacks do not mandate what kind of executable can be used here. We have created a Bash script for convenience, but these executables could just as easily be written in Go, Python, Java, or any other language.
 
-One or more buildpacks can be combined into a builder. Each buildpack is responsible for determining if it is compatible with the supplied source code, and the first compatible buildpack will be used to compile the code. This is how we can run a command like `pack build` against our code without having to define what language our code is written in; builders like the ones supplied by Heroku come with many buildpacks that detect many different languages.
+One or more buildpacks can be combined into a builder. Each buildpack is responsible for determining if it is compatible with the supplied source code, and the first compatible buildpack will be used to compile the code. This is how we can run a command like `pack build` against an arbitrary code base without having to define what language our code is written in; builders like the ones supplied by Heroku come with many buildpacks that detect many different languages.
 
 Our detection script is simple: if a `pom.xml` file does not exist, we return a non-zero return code to indicate that our buildpack is not compatible. Otherwise the script has a zero return code to indicate that it is compatible:
 
