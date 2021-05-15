@@ -71,7 +71,9 @@ In order to use buildpacks, ensure you have [Docker](https://www.docker.com/) in
 
 To build the sample application with a buildpack, we'll need to install what is known as a *platform*, which in our case is a CLI tool called `pack`. Instructions for installing `pack` can be found [here](https://buildpacks.io/docs/tools/pack/), with packages available for most major operating systems.
 
-When you first run `pack` you will be prompted to configure a default builder. We'll cover terminology like *builder* in more detail later in the post, but for now all we need to understand is that a builder contains the buildpacks that compile our code, and that companies like Heroku and Google, and groups like Paketo, provide a number of builders we can use. Here is the output of `pack` asking us to define a default builder:
+When you first run `pack` you will be prompted to configure a default builder. We'll cover terminology like *builder* in more detail later in the post, but for now all we need to understand is that a builder contains the buildpacks that compile our code, and that companies like Heroku and Google, and groups like Paketo, provide a number of builders we can use. 
+
+Here is the output of `pack` asking us to define a default builder:
 
 ```
 Please select a default builder with:
@@ -96,7 +98,7 @@ We'll make use of the Heroku Ubuntu 20.04 builder, which we configure with the c
 pack config default-builder heroku/buildpacks:20
 ```
 
-Then, in the directory containing the petclinic source code, run the command:
+Then, in the `spring-petclinic` directory, run the command:
 
 ```
 pack build myimage
