@@ -124,9 +124,9 @@ The resulting web application has been exposed on port 8080, so we can access it
 
 It is worth taking a moment to appreciate what we just achieved here. With a single command we compiled source code that had no Docker configuration into an executable Docker image. We never needed to install any Java tooling, and never needed to configure any Java settings.
 
-To verify that the application dependencies were cached, run `pack build myimage2`. Notice this time the build process completes much faster as all the downloads from the previous build are reused. This demonstrates how buildpacks are provide an efficient build process.
+To verify that the application dependencies were cached, run `pack build myimage2`. Notice this time the build process completes much faster as all the downloads from the previous build are reused. This demonstrates how buildpacks provide an efficient build process.
 
-The process we just ran through here is also easily repeated on any machine with Docker and the `pack` CLI installed. It would take very little to recreate this process in a CI server, meaning build on a centralized build server and local developers PCs work the same way.
+The process we just ran through here is also easily repeated on any machine with Docker and the `pack` CLI installed. It would take very little to recreate this process in a CI server, meaning builds on a centralized build server and local developers PCs work the same way.
 
 To demonstrate the flexibility of buildpacks, we create a simple buildpack of our own to compile a Java application with Maven.
 
