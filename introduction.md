@@ -239,7 +239,7 @@ if [[ ! -f pom.xml ]]; then
 fi
 ```
 
-The work of building the source code is done in the `build` executable:
+The work of building the source code is performed in the `build` executable:
 
 ```bash
 #!/usr/bin/env bash
@@ -424,9 +424,9 @@ Once the build completes, we'll have a `jar` file in the `target` directory. We 
 
 The `jar` file needs to be configured to be executed in the executable image. This is done in the `launch.toml` file.
 
-The `type` is set to `web`. If the `type` was set to any other value, we'd have to define the `PACK_PROCESS_TYPE` to the same value when running the executable image. But the `type` of `web` means we can run the executable image with no special configuration.
+The `type` property is set to `web`. If the `type` was set to any other value, we'd have to define the `PACK_PROCESS_TYPE` to the same value when running the executable image. But the `type` of `web` means we can run the executable image with no special configuration.
 
-The `command` defines how the `jar` file is executed:
+The `command` property defines how the `jar` file is executed:
 
 ```bash
 for jarFile in $(find target -maxdepth 1 -name "*.jar" -type f); do
@@ -439,20 +439,20 @@ EOF
 done
 ```
 
-With the `buildpack.toml`, `bin/detect`, and `bin/build` files written, we now have a buildpack we can use to build our application. Assuming the petclinic code is in the `spring-petclinic` directory, and the buildpack files are in the `JavaBuildPack` directory, we build our Docker image with the command:
+With the `buildpack.toml`, `bin/detect`, and `bin/build` files written, we now have a buildpack we can use to compile our application. Assuming the petclinic code is in the `spring-petclinic` directory, and the buildpack files are in the `JavaBuildPack` directory, we build our Docker image with the command:
 
 ```
 pack build petclinic --path ./spring-petclinic --buildpack ./JavaBuildPack
 ```
 
-As before, our code is compiled into an executable image, but this time called `petclinic`. Our custom build pack will:
+As before, our code is compiled into an executable image, this time called `petclinic`. Our custom build pack will:
 
 1. Detect the presence of a `pom.xml` file, and indicate that this buildpack is compatible with the supplied source code.
 1. Create four layers to hold the Maven dependencies, the Maven distribution, the JDK, and the JRE.
 2. If the layers have not yet been populated, Maven, a JDK, and a JRE are downloaded and extracted into their associated layer.
 3. A Maven build is performed, placing any downloaded dependencies into the associated layer.
 4. The executable image is created containing the generated `jar` file and the JRE layer, and configured to execute the `jar` file.
-5. All layers are cached, so subsequent builds can skip most, of not all, of the file downloads performed during the first build.
+5. All layers are cached, so subsequent builds can skip most, if not all, of the file downloads performed during the first build.
 
 And with that we have created our very own buildpack to compile Java Maven applications.
 
