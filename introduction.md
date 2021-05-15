@@ -250,7 +250,7 @@ layersdir=$1
 
 dependencieslayer="$layersdir"/dependencies
 mkdir -p "$dependencieslayer/.m2/repository"
-echo -e 'cache = true' > "$layersdir/dependencies.toml"
+echo -e 'cache = true\nbuild = true' > "$layersdir/dependencies.toml"
 
 mavenLayer="$layersdir"/maven
 mkdir -p "$mavenLayer"
@@ -324,6 +324,118 @@ layersdir=$1
 ```
 
 Buildpacks use layers to hold files that are of importance when building the code and running the compiled application. Layers can optionally be cached to ensure that any files saved by a previous build are reused.
+
+A layer is simply a directory, paired with a TOML file to configure the layer metadata.
+
+We start by creating a directory to hold our application's dependencies:
+
+```bash
+dependencieslayer="$layersdir"/dependencies
+```
+
+Under this directory we create a nested directory structure to hold our Maven dependencies:
+
+```bash
+mkdir -p "$dependencieslayer/.m2/repository"
+```
+
+To configure this directory as a layer, we create a TOML file with the same name as the directory, meaning in this case the file is called `dependencies.toml`. We set two properties to `true`: `cache`, which indicates that the files placed in this directory will be made available to subsequent builds, and `build`, which indicates this layer is used as part of the build process:
+
+```bash
+echo -e 'cache = true\nbuild = true' > "$layersdir/dependencies.toml"
+```
+
+We create a new layer which will hold a Maven distribution. This layer is also cached and used for the build process:
+
+```bash
+mavenLayer="$layersdir"/maven
+mkdir -p "$mavenLayer"
+echo -e 'cache = true\nbuild = true' > "$layersdir/maven.toml"
+```
+
+We have another layer to hold the JDK, and again this layer is cached and used for the build process:
+
+```bash
+jdkLayer="$layersdir"/jdk
+mkdir -p "$jdkLayer"
+echo -e 'cache = true\nbuild = true' > "$layersdir/jdk.toml"
+```
+
+The final layer will hold the JRE. This layer is used for the executable Docker image, so the `launch` property is set to `true`. This layer is also cached:
+
+```bash
+jreLayer="$layersdir"/java
+mkdir -p "$jreLayer"
+echo -e 'launch = true\ncache = true' > "$layersdir/java.toml"
+```
+
+We now populate the layers. The following commands check to see if the `mvn` executable already exists, and if not, will download and extract Maven.
+
+The first time we run this buildpack, the Maven layer will be empty, and the Maven archive will be downloaded. Because this layer is cached, the second time the buildpack is run, the Maven files will already be available, and the download will be skipped:
+
+```bash
+# Download Maven if it doesn't exist already.
+if [[ ! -f $mavenLayer/bin/mvn ]]; then
+	echo "Downloading Maven"
+	maven_url=https://apache.mirror.digitalpacific.com.au/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz
+	# Ensure the executables are placed under the layer's bin directory by stripping the first
+	# directory from the tar file.
+	wget -q -O - "$maven_url" | tar --strip-components=1 -xzf - -C "$mavenLayer"
+else
+	echo "Skipped Maven Download"
+fi
+```
+
+We follow the same pattern with the JDK and JRE:
+
+```bash
+# Download JDK if it doesn't exist already.
+if [[ ! -f $jdkLayer/bin/java ]]; then
+	echo "Downloading JDK"
+	jdk_url=https://cdn.azul.com/zulu/bin/zulu11.48.21-ca-jdk11.0.11-linux_x64.tar.gz
+	# Ensure the executables are placed under the layer's bin directory by stripping the first
+	# directory from the tar file.
+	wget -q -O - "$jdk_url" | tar --strip-components=1 -xzf - -C "$jdkLayer"
+else
+	echo "Skipped JDK Download"
+fi
+
+# Download JRE if it doesn't exist already.
+if [[ ! -f $jreLayer/bin/java ]]; then
+	echo "Downloading JRE"
+	jre_url=https://cdn.azul.com/zulu/bin/zulu11.48.21-ca-jre11.0.11-linux_x64.tar.gz
+	# Ensure the executables are placed under the layer's bin directory by stripping the first
+	# directory from the tar file.
+	wget -q -O - "$jre_url" | tar --strip-components=1 -xzf - -C "$jreLayer"
+else
+	echo "Skipped JRE Download"
+fi
+```
+
+We now have all the files we need to build our application. We set the `JAVA_HOME` environment variable to the directory holding the JDK layer, and then call `mvn` from the Maven layer. We set the `maven.repo.local` property to instruct Maven to download any dependencies to our dependency layer. Finally we run the `clean` and `package` Maven goals:
+
+```bash
+JAVA_HOME=$jdkLayer $mavenLayer/bin/mvn -Dmaven.repo.local=$dependencieslayer/.m2/repository clean package
+```
+
+Once the build completes, we'll have a `jar` file in the `target` directory. We don't know the exact name of this file, but we know there will be one `jar` file, so we use the `find` command to return the matching file.
+
+The `jar` file needs to be configured to be executed in the executable image. This is done via the `launch.toml` file.
+
+The `type` is set to `web`. If the `type` was set to any other value, we'd have to define the `PACK_PROCESS_TYPE` to the same value when running the executable image. But the `type` of `web` means we can run the executable image with no special configuration.
+
+The `command` defines how the `jar` file is executed:
+
+```bash
+for jarFile in $(find target -maxdepth 1 -name "*.jar" -type f); do
+	cat >> "$layersdir/launch.toml" <<EOF
+[[processes]]
+type = "web"
+command = "java -jar $jarFile"
+EOF
+	break;
+done
+```
 
 ## What is ________?
 
