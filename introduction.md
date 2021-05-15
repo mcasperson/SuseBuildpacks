@@ -134,7 +134,106 @@ The buildpack specification has been in development for at least a decade. Build
 
 Buildpacks have been used by these platforms to take application source code written in a huge variety of languages, compile it into a Docker image, and then host that image on a variety of Platform as a Service (PaaS) offerings. To accommodate the variety of code that developers host on these platforms, the [buildpack interface specification](https://github.com/buildpacks/spec/blob/main/buildpack.md) is quite detailed and flexible.
 
-However, our sample buildpack will be quite simple and use only a subset of the functionality available to us. But even with this simple example, we can demonstrate many of the benefits that buildpacks bring to a build pipeline.
+Our sample buildpack will be quite simple and use only a subset of the functionality available to us. But even with this simple example, we can demonstrate many of the benefits that buildpacks bring to a build pipeline.
+
+```toml
+# Buildpack API version
+api = "0.5"
+
+# Buildpack ID and metadata
+[buildpack]
+id = "mcasperson/java"
+version = "0.0.1"
+name = "Java Buildpack"
+
+# Stacks that the buildpack will work with
+[[stacks]]
+id = "heroku-20"
+```
+
+```bash
+#!/usr/bin/env bash
+
+# The -e option will cause a bash script to exit immediately when a command fails.
+# The -o pipefail option means if command in a pipeline fails, that return code will be used as the return code of the whole pipeline.
+set -eo pipefail
+
+# Check for the presense of a pom.xml file.
+if [[ ! -f pom.xml ]]; then
+	# If pom.xml does not exist, return an error code.
+	exit 100
+fi
+```
+
+```bash
+#!/usr/bin/env bash
+
+# The -e option will cause a bash script to exit immediately when a command fails.
+# The -o pipefail option means if command in a pipeline fails, that return code will be used as the return code of the whole pipeline.
+set -eo pipefail
+
+layersdir=$1
+
+dependencieslayer="$layersdir"/dependencies
+mkdir -p "$dependencieslayer/.m2/repository"
+echo -e 'cache = true' > "$layersdir/dependencies.toml"
+
+mavenLayer="$layersdir"/maven
+mkdir -p "$mavenLayer"
+echo -e 'cache = true\nbuild = true' > "$layersdir/maven.toml"
+
+jdkLayer="$layersdir"/jdk
+mkdir -p "$jdkLayer"
+echo -e 'cache = true\nbuild = true' > "$layersdir/jdk.toml"
+
+jreLayer="$layersdir"/java
+mkdir -p "$jreLayer"
+echo -e 'launch = true\ncache = true' > "$layersdir/java.toml"
+
+# Download Maven if it doesn't exist already.
+if [[ ! -f $mavenLayer/bin/mvn ]]; then
+	echo "Downloading Maven"
+	maven_url=https://apache.mirror.digitalpacific.com.au/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz
+	# Ensure the executables are placed under the layer's bin directory by stripping the first
+	# directory from the tar file.
+	wget -q -O - "$maven_url" | tar --strip-components=1 -xzf - -C "$mavenLayer"
+else
+	echo "Skipped Maven Download"
+fi
+
+# Download JDK if it doesn't exist already.
+if [[ ! -f $jdkLayer/bin/java ]]; then
+	echo "Downloading JDK"
+	jdk_url=https://cdn.azul.com/zulu/bin/zulu11.48.21-ca-jdk11.0.11-linux_x64.tar.gz
+	# Ensure the executables are placed under the layer's bin directory by stripping the first
+	# directory from the tar file.
+	wget -q -O - "$jdk_url" | tar --strip-components=1 -xzf - -C "$jdkLayer"
+else
+	echo "Skipped JDK Download"
+fi
+
+# Download JRE if it doesn't exist already.
+if [[ ! -f $jreLayer/bin/java ]]; then
+	echo "Downloading JRE"
+	jre_url=https://cdn.azul.com/zulu/bin/zulu11.48.21-ca-jre11.0.11-linux_x64.tar.gz
+	# Ensure the executables are placed under the layer's bin directory by stripping the first
+	# directory from the tar file.
+	wget -q -O - "$jre_url" | tar --strip-components=1 -xzf - -C "$jreLayer"
+else
+	echo "Skipped JRE Download"
+fi
+
+JAVA_HOME=$jdkLayer $mavenLayer/bin/mvn -Dmaven.repo.local=$dependencieslayer/.m2/repository clean package
+
+for jarFile in $(find target -maxdepth 1 -name "*.jar" -type f); do
+	cat >> "$layersdir/launch.toml" <<EOF
+[[processes]]
+type = "web"
+command = "java -jar $jarFile"
+EOF
+	break;
+done
+```
 
 ## What is ________?
 
