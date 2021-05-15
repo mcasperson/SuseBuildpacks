@@ -132,9 +132,9 @@ To demonstrate the flexibility of buildpacks, we create a simple buildpack of ou
 
 ## A sample buildpack
 
-The buildpack specification has been in development for at least a decade. Buildpacks were first conceived by Heroku in 2011, and since then Heroku and Pivotal have worked to formalize the specification as part of the Cloud Native Buildpacks project. 
+The buildpack specification has been in development for at least a decade. Buildpacks were first conceived by Heroku in 2011, and since then Heroku and Pivotal have worked to formalize a specification as part of the Cloud Native Buildpacks project. 
 
-Buildpacks have been used by these platforms to take application source code written in a huge variety of languages, compile it into a Docker image, and then host that image on a variety of Platform as a Service (PaaS) offerings. To accommodate the variety of code that developers host on these platforms, the [buildpack interface specification](https://github.com/buildpacks/spec/blob/main/buildpack.md) is quite detailed and flexible.
+Buildpacks have been used by these platforms to consume application source code written in a huge variety of languages, compile it into a Docker image, and then host that image on a variety of Platform as a Service (PaaS) offerings. To accommodate the variety of code that developers host on these platforms, the [buildpack interface specification](https://github.com/buildpacks/spec/blob/main/buildpack.md) is quite detailed and flexible.
 
 Our sample buildpack will be quite simple and use only a subset of the functionality available to us. But even with this simple example, we can demonstrate many of the benefits that buildpacks bring to a build pipeline.
 
