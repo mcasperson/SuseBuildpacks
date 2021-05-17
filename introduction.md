@@ -59,7 +59,7 @@ To demonstrate just how powerful buildpacks are, let's take a typical Java appli
 
 ## Building an example application
 
-[Petclinic](https://github.com/spring-projects/spring-petclinic) is a sample Java Spring web application that has been lovingly maintained over the years as a demonstration of the Spring platform. It represents the kind of code base you would find in many engineering departments. Although the git repository contains a `docker-compose.yml` file, this is only to run a MySQL database instance. Neither the application source code nor the build scripts provide any facility to build Docker images.
+[Petclinic](https://github.com/spring-projects/spring-petclinic) is a sample Java Spring web application that has been lovingly maintained over the years as a demonstration of the Spring platform. It represents the kind of code base you would find in many engineering departments. Although the git repository contains a `docker-compose.yml` file, this is only to run a MySQL database instance. Neither the application source code nor the build scripts provide any facility to create Docker images.
 
 Clone the git repository with the command:
 
@@ -106,7 +106,7 @@ pack build myimage
 
 It is important to note that we do not need to have the Java Development Kit (JDK) or Maven installed for `pack` to build our source code. We also don't need to tell `pack` that we are trying to build Java code. The Heroku builder (or any other builder you may be using) conveniently takes care of all of this for us.
 
-The first time you run a build, all of the application dependencies are downloaded. And there are a lot! On my home internet connection, it took around 30 minutes to complete the downloads. Once these downloads complete, the application is compiled, and a Docker image called `myimage` is created. We can verify this by running the command:
+The first time build build is run, all of the application dependencies are downloaded. And there are a lot! On my home internet connection, it took around 30 minutes to complete the downloads. Once these downloads complete, the application is compiled, and a Docker image called `myimage` is created. We can verify this by running the command:
 
 ```
 docker image ls --filter reference=myimage
@@ -118,7 +118,7 @@ To run the Docker image, run the command:
 docker run -p 8080:8080 myimage
 ```
 
-The resulting web application has been exposed on port 8080, so we can access it via the URL http://localhost:8080. You will see a page like this:
+The resulting web application has been exposed on port 8080, so we can access it via the URL http://localhost:8080. The result is a web page that looks like this:
 
 ![](petclinic.png)
 
