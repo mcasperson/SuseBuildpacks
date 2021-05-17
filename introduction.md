@@ -59,7 +59,7 @@ To demonstrate just how powerful buildpacks are, let's take a typical Java appli
 
 ## Building an example application
 
-[Petclinic](https://github.com/spring-projects/spring-petclinic) is a sample Java Spring web application that has been lovingly maintained over the years as a demonstration of the Spring platform. It represents the kind of code base you would find in many engineering departments. Although the git repository contains a `docker-compose.yml` file, this is only to run a MySQL database instance - neither the application source code nor the build scripts provide any facility to build Docker images.
+[Petclinic](https://github.com/spring-projects/spring-petclinic) is a sample Java Spring web application that has been lovingly maintained over the years as a demonstration of the Spring platform. It represents the kind of code base you would find in many engineering departments. Although the git repository contains a `docker-compose.yml` file, this is only to run a MySQL database instance. Neither the application source code nor the build scripts provide any facility to build Docker images.
 
 Clone the git repository with the command:
 
@@ -69,9 +69,9 @@ git clone https://github.com/spring-projects/spring-petclinic.git
 
 In order to use buildpacks, ensure you have [Docker](https://www.docker.com/) installed.
 
-To build the sample application with a buildpack, we'll need to install what is known as a *platform*, which in our case is a CLI tool called `pack`. Instructions for installing `pack` can be found [here](https://buildpacks.io/docs/tools/pack/), with packages available for most major operating systems.
+To build the sample application with a buildpack, we'll need to install what is known as a *[platform](https://buildpacks.io/docs/concepts/components/platform/)*, which in our case is a CLI tool called `pack`. Instructions for installing `pack` can be found [here](https://buildpacks.io/docs/tools/pack/), with packages available for most major operating systems.
 
-When you first run `pack` you will be prompted to configure a default builder. We'll cover terminology like *builder* in more detail later in the post, but for now all we need to understand is that a builder contains the buildpacks that compile our code, and that companies like Heroku and Google, and groups like Paketo, provide a number of builders we can use. 
+When you first run `pack` you will be prompted to configure a default builder. We'll cover terminology like *[builder](https://buildpacks.io/docs/concepts/components/builder/)* in subsequent posts, but for now all we need to understand is that a builder contains the buildpacks that compile our code, and that companies like Heroku and Google, and groups like Paketo, provide a number of builders we can use. 
 
 Here is the output of `pack` asking us to define a default builder:
 
