@@ -333,13 +333,15 @@ EOF
 done
 ```
 
-With the `buildpack.toml`, `bin/detect`, and `bin/build` files written, we now have a buildpack we can use to compile our application. Assuming the petclinic code is in the `spring-petclinic` directory, and the buildpack files are in the `JavaBuildPack` directory, we build our Docker image with the command:
+With the `buildpack.toml`, `bin/detect`, and `bin/build` files written, we now have a buildpack we can use to compile our application. 
+
+Assuming the petclinic code is in the `spring-petclinic` directory, and the buildpack files are in the `JavaBuildPack` directory, we build our Docker image with the command:
 
 ```
 pack build petclinic --path ./spring-petclinic --buildpack ./JavaBuildPack
 ```
 
-As before, our code is compiled into an executable image, this time called `petclinic`. Our custom build pack will:
+As before, our code is compiled into an executable Docker image, this time called `petclinic`. Our custom build pack will:
 
 1. Detect the presence of a `pom.xml` file, and indicate that this buildpack is compatible with the supplied source code.
 1. Create four layers to hold the Maven dependencies, the Maven distribution, the JDK, and the JRE.
@@ -354,7 +356,7 @@ And with that we have created our very own buildpack to compile Java Maven appli
 
 There are many high quality and battle tested buildpacks created by PaaS platforms who are heavily invested in building and deploying whatever code their customers throw at them. Anyone getting started with buildpacks would be well served by these freely available options.
 
-For those looking to provide a customized build experience for their team though, a custom buildpack may be the answer. In this post we built a simple buildpack to compile a Java Maven application, and with three relatively simple files we were able to construct and run a custom build pack against our sample application.
+For those looking to provide a specialized build experience for their team though, a custom buildpack may be the answer. In this post we built a simple buildpack to compile a Java Maven application, and with three relatively simple files we were able to construct and run a custom build pack against our sample application.
 
 <!--
 
