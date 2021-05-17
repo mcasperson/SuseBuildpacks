@@ -126,7 +126,7 @@ It is worth taking a moment to appreciate what we just achieved here. With a sin
 
 To verify that the application dependencies were cached, run `pack build myimage2`. Notice this time the build process completes much faster as all the downloads from the previous build are reused. This demonstrates how buildpacks provide an efficient build process.
 
-The process we just ran through here is also easily repeated on any machine with Docker and the `pack` CLI installed. It would take very little to recreate this process in a CI server, meaning builds on a centralized build server and local developers PCs work the same way.
+The process we just ran through here is also easily repeated on any machine with Docker and the `pack` CLI installed. It would take very little to recreate this process in a CI server, meaning builds on a centralized build server and local developers machines work the same way.
 
 ## Conclusion
 
