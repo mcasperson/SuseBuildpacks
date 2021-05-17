@@ -2,7 +2,7 @@
 title: "Creating your own buildpack"
 author: Matthew Casperson
 date: 05/31/2021
-description: "Learn how to create a simple buildpack to compile Java Maven applications"
+description: "Learn how to create a simple buildpack for compiling Java Maven applications"
 type: "blog"
 tags: ["Conceptual"]
 categories: [blog]
@@ -22,7 +22,7 @@ In this blog post we'll create a simple buildpack to build a Java Maven applicat
 
 The buildpack specification has been in development for at least a decade. Buildpacks were first conceived by Heroku in 2011, and since then Heroku and Pivotal have worked to formalize a specification as part of the Cloud Native Buildpacks project. 
 
-Buildpacks have been used by these platforms to consume application source code written in a huge variety of languages, compile it into a Docker image, and then host that image on a variety of Platform as a Service (PaaS) offerings. To accommodate the variety of code that developers host on these platforms, the [buildpack interface specification](https://github.com/buildpacks/spec/blob/main/buildpack.md) is quite detailed and flexible.
+Buildpacks have been used by these platforms to consume application source code written in a huge variety of languages, compile it into a Docker image, and then host that image on a variety of Platform as a Service (PaaS) offerings. To accommodate the variety of code that developers host on these platforms, the [buildpack interface specification](https://github.com/buildpacks/spec/blob/main/buildpack.md) is detailed and flexible.
 
 Our sample buildpack will be quite simple and use only a subset of the functionality available to us. But even with this simple example, we can demonstrate many of the benefits that buildpacks bring to a build pipeline.
 
@@ -51,7 +51,7 @@ The `api` property defines the buildpack API version the buildpack adheres to:
 api = "0.5"
 ```
 
-The `buildpack` section defines the details of our buildpack. The `id` property is a globally unique identifier, the `version` property defines the buildpack version, and the `name` defines a human readable name.
+The `buildpack` section defines the details of our buildpack. The `id` property is a globally unique identifier, the `version` property defines the buildpack version, and the `name` defines a human readable name:
 
 ```
 [buildpack]
@@ -62,7 +62,11 @@ name = "Java Buildpack"
 
 The `stacks` array (double brackets defines an array item in TOML) defines a stack that this buildpack is compatible with.
 
-A *stack* is a pair of Docker images: one image that is used to build the software, and a second image used to host the application. It is possible to create these images yourself, but we'll reuse an existing stack. We can find a list of stacks with the command `pack stack suggest`, which returns the following list:
+A *[stack](https://buildpacks.io/docs/concepts/components/stack/)* is a pair of Docker images: one image that is used to build the software (the build image), and a second image used to host the application (the run image). 
+
+The run image is usually quite lean to reduce the size of the final executable Docker image. The build image will typically contain the kind of packages required when compiling software, such as compilers like GCC, and header files like those for the Linux kernel. This allows the build image to support languages that compile native libraries on the fly.
+
+It is possible to create these images yourself, but we'll reuse an existing stack. We can find a list of stacks with the command `pack stack suggest`, which returns the following list:
 
 ```
 Stacks maintained by the community:
