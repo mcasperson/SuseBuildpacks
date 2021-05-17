@@ -132,7 +132,7 @@ The process we just ran through here is also easily repeated on any machine with
 
 The evolution of building software has seen engineering teams go from building on their local machines, to building via a CI server, to multistage Docker builds. Buildpacks take the best ideas from all of these practices to provide a build process that is identical whether run on a developers local machine or on a CI server, while taking advantage of the isolation and reproducibility of Docker, without the overhead of forcing every developer to craft a best practice Docker build script.
 
-In this post we demonstrated how publicly available buildpacks could be used to quickly compile a traditional Java application into an executable Docker image. 
+In this post we demonstrated how publicly available buildpacks can be used to quickly compile a traditional Java application into an executable Docker image. 
 
 For those looking to customize their build experience, in the next blog post we create a simple buildpack of our own to compile a Java application with Maven.
 
