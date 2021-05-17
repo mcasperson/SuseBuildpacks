@@ -239,7 +239,9 @@ To configure this directory as a layer, we create a TOML file with the same name
 echo -e 'cache = true\nbuild = true' > "$layersdir/dependencies.toml"
 ```
 
-We create a new layer which will hold a Maven distribution. This layer is also cached and used for the build process:
+We create a new layer which will hold a Maven distribution. This layer is also cached and used for the build process.
+
+Note that we create a layer per application to take advantage of the fact that binary files under the layer `/bin` directory [are added to the path automatically](https://github.com/buildpacks/spec/blob/main/buildpack.md#layer-paths). Most Linux applications distributions place binary files inside a `bin` directory for us, so by extracting application archives into their own layer, we conveniently expose those applications on the path:
 
 ```bash
 mavenLayer="$layersdir"/maven
