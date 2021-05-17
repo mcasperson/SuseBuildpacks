@@ -11,7 +11,7 @@ the Rancher community:
 title: "A developers introduction to buildpacks"
 author: Matthew Casperson
 date: 05/31/2021
-description: "Learn how buildpacks evolved and the benefits they can bring to developers workflows"
+description: "Learn how buildpacks evolved and the benefits they can bring to developer's workflows"
 type: "blog"
 tags: ["Conceptual"]
 categories: [blog]
