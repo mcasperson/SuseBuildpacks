@@ -55,7 +55,7 @@ Buildpacks are:
 
 For all these benefits though, buildpacks are not a complete replacement for your CI system. For a start, buildpacks only generate Docker images. If you deploy applications to a web or application server, buildpacks won't generate the kind of traditional artifacts you need. It is also quite likely that you will execute buildpacks on a CI server to retain the benefits of a centralized source of truth.
 
-To demonstrate just how powerful buildpacks are, let's take a typical Java application that has no Docker build configurations and create an executable Docker image with a buildpack.
+To demonstrate just how powerful buildpacks are, let's take a typical Java application that has no Docker build configurations and create an executable Docker image.
 
 ## Building an example application
 
