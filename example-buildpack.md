@@ -66,7 +66,7 @@ A *[stack](https://buildpacks.io/docs/concepts/components/stack/)* is a pair of 
 
 The run image is usually quite lean to reduce the size of the final executable Docker image. The build image will typically contain the kind of packages required when compiling software, such as compilers like GCC, and header files like those for the Linux kernel. This allows the build image to support languages that compile native libraries on the fly.
 
-It is possible to create these images yourself, but we'll reuse an existing stack. We can find a list of stacks with the command `pack stack suggest`, which returns the following list:
+It is possible to create these images yourself, but for this example we'll reuse an existing stack. We can find a list of stacks with the command `pack stack suggest`, which returns the following list:
 
 ```
 Stacks maintained by the community:
@@ -109,7 +109,7 @@ Our buildpack will be compatible with the `heroku-20` stack:
 id = "heroku-20"
 ```
 
-The next file is a bash script called `detect`, in the `bin` subdirectory. These executables are called as part of the buildpack lifecycle. The `detect` executable determines if the source code the buildpack has been run against is a Java Maven application.
+The next file is a bash script called `detect`, in the `bin` subdirectory. These executables are called as part of the buildpack *[lifecycle](https://buildpacks.io/docs/concepts/components/lifecycle/)*. The `detect` executable determines if the source code the buildpack has been run against is a Java Maven application.
 
 Note buildpacks do not mandate what kind of executable can be used here. We have created a Bash script for convenience, but these executables could just as easily be written in Go, Python, Java, or any other language.
 
